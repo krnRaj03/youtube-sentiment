@@ -118,13 +118,3 @@ dvc repro
 Pull requests are welcome!
 For major changes, open an issue first to discuss what you’d like to add.
 
----
-
-## License
-
-This project is licensed under the **MIT License**.
-
----
-
-Would you like me to also add a **one-line project badge header** (Python, LightGBM, DVC) at the top, so it looks polished but still professional?
-
