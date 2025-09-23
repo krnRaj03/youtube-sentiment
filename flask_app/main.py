@@ -79,28 +79,27 @@ def predict_with_timestamps():
         comments = [item['text'] for item in comments_data]
         timestamps = [item['timestamp'] for item in comments_data]
 
-        # Preprocess each comment before vectorizing
+        # Preprocess comments
         preprocessed_comments = [preprocess_comment(comment) for comment in comments]
         
-        # Transform comments using the vectorizer
+        # Vectorize: Transform to sparse matrix, then dense array
         transformed_comments = vectorizer.transform(preprocessed_comments)
-
-        # Convert the sparse matrix to dense format
-        dense_comments = transformed_comments.toarray()  # Convert to dense array
+        dense_comments = transformed_comments.toarray()
         
-        # Convert to DataFrame if model expects it (assuming feature names from vectorizer)
+        # Create DataFrame with exact feature names from vectorizer (matches model schema)
         feature_names = vectorizer.get_feature_names_out()
-        dense_df = pd.DataFrame(dense_comments, columns=feature_names)
+        input_df = pd.DataFrame(dense_comments, columns=feature_names)
         
-        # Make predictions using DataFrame input
-        predictions = model.predict(dense_df).tolist()  # Convert to list
+        # Make predictions
+        predictions = model.predict(input_df).tolist()
         
         # Convert predictions to strings for consistency
         predictions = [str(pred) for pred in predictions]
     except Exception as e:
+        app.logger.error(f"Prediction error: {str(e)}")  # Log for debugging
         return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
     
-    # Return the response with original comments, predicted sentiments, and timestamps
+    # Return response
     response = [{"comment": comment, "sentiment": sentiment, "timestamp": timestamp} for comment, sentiment, timestamp in zip(comments, predictions, timestamps)]
     return jsonify(response)
 
@@ -109,35 +108,25 @@ def predict_with_timestamps():
 def predict():
     data = request.json
     comments = data.get('comments')
-    print("i am the comment: ", comments)
-    print("i am the comment type: ", type(comments))
+    print("Received comments:", comments)
     
     if not comments:
         return jsonify({"error": "No comments provided"}), 400
 
     try:
-        # Preprocess each comment before vectorizing
         preprocessed_comments = [preprocess_comment(comment) for comment in comments]
         
-        # Transform comments using the vectorizer
-        transformed_comments = vectorizer.transform(preprocessed_comments)
-
-        # Convert the sparse matrix to dense format
-        dense_comments = transformed_comments.toarray()  # Convert to dense array
+        # Create DataFrame with expected schema
+        input_df = pd.DataFrame({'Review': preprocessed_comments})
         
-        # Convert to DataFrame if model expects it (assuming feature names from vectorizer)
-        feature_names = vectorizer.get_feature_names_out()
-        dense_df = pd.DataFrame(dense_comments, columns=feature_names)
+        # Make predictions
+        predictions = model.predict(input_df).tolist()
         
-        # Make predictions using DataFrame input
-        predictions = model.predict(dense_df).tolist()  # Convert to list
-        
-        # Convert predictions to strings for consistency
         predictions = [str(pred) for pred in predictions]
     except Exception as e:
+        app.logger.error(f"Prediction error: {str(e)}")
         return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
     
-    # Return the response with original comments and predicted sentiments
     response = [{"comment": comment, "sentiment": sentiment} for comment, sentiment in zip(comments, predictions)]
     return jsonify(response)
 
