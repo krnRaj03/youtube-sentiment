@@ -37,3 +37,71 @@ stages:
       md5: a2bbccdc23dd271231099f8d5c99ff87.dir
       size: 5098055
       nfiles: 2
+  model_building:
+    cmd: python3 src/model/model_build.py
+    deps:
+    - path: data/interim/train_processed.csv
+      hash: md5
+      md5: 86284f4698366b0f2ee05c211c0e9453
+      size: 4104889
+    - path: src/model/model_build.py
+      hash: md5
+      md5: 8d056a49eea42a845d1c8ee59c587381
+      size: 5485
+    params:
+      params.yaml:
+        model_building.learning_rate: 0.09
+        model_building.max_depth: 20
+        model_building.max_features: 1000
+        model_building.n_estimators: 367
+        model_building.ngram_range:
+        - 1
+        - 3
+    outs:
+    - path: lgbm_model.pkl
+      hash: md5
+      md5: e270495d94e384eb6f8ff4800087df70
+      size: 3904458
+    - path: tfidf_vectorizer.pkl
+      hash: md5
+      md5: e78163dbf2120c4bb5d05cc77a8bd253
+      size: 36873
+  model_evaluation:
+    cmd: python3 src/model/model_evaluate.py
+    deps:
+    - path: data/interim/test_processed.csv
+      hash: md5
+      md5: 5b260b8114240fb9c541c0d07b150b14
+      size: 993166
+    - path: data/interim/train_processed.csv
+      hash: md5
+      md5: 86284f4698366b0f2ee05c211c0e9453
+      size: 4104889
+    - path: lgbm_model.pkl
+      hash: md5
+      md5: e270495d94e384eb6f8ff4800087df70
+      size: 3904458
+    - path: src/model/model_evaluate.py
+      hash: md5
+      md5: b6069c630bd06f3313202f4bf56d1198
+      size: 7170
+    - path: tfidf_vectorizer.pkl
+      hash: md5
+      md5: e78163dbf2120c4bb5d05cc77a8bd253
+      size: 36873
+    outs:
+    - path: experiment_info.json
+      hash: md5
+      md5: 8cd44cdd67bc80ff8588d0a9874cdec3
+      size: 84
+  model_registration:
+    cmd: python3 src/model/model_register.py
+    deps:
+    - path: experiment_info.json
+      hash: md5
+      md5: 8cd44cdd67bc80ff8588d0a9874cdec3
+      size: 84
+    - path: src/model/model_register.py
+      hash: md5
+      md5: e6e045d215b8c75858a6b6d84dab5574
+      size: 2429
