@@ -125,7 +125,7 @@ def predict():
 
 
 
-# New route to fetch comments using the loaded API key
+# New route to fetch comments 
 @app.route('/fetch_comments', methods=['GET'])
 def fetch_comments():
     video_id = request.args.get('videoId')
