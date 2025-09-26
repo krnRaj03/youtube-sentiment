@@ -16,6 +16,7 @@ from nltk.stem import WordNetLemmatizer
 import mlflow
 from mlflow.tracking import MlflowClient
 from dotenv import load_dotenv
+from googleapiclient.discovery import build  # Add this import for YouTube API
 
 # --------------------------
 # Load environment variables
@@ -123,7 +124,6 @@ def predict():
     return jsonify(response)
 
 
-from googleapiclient.discovery import build  # Add this import for YouTube API
 
 # New route to fetch comments using the loaded API key
 @app.route('/fetch_comments', methods=['GET'])
